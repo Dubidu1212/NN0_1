@@ -13,3 +13,10 @@ void FeedForwardNetwork::trainBatch(std::vector<std::pair<Mat1f, Mat1f>> batch) 
 void FeedForwardNetwork::print() {
 
 }
+
+FeedForwardNetwork::FeedForwardNetwork(std::vector<int> layersizes) {
+    layers = layersizes.size();
+
+}
+
+

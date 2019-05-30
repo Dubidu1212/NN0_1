@@ -1,0 +1,75 @@
+\hypertarget{classFeedForwardNetwork}{}\section{Feed\+Forward\+Network Class Reference}
+\label{classFeedForwardNetwork}\index{Feed\+Forward\+Network@{Feed\+Forward\+Network}}
+
+
+Class for standard Feed Forward Neural Network.  
+
+
+
+
+{\ttfamily \#include $<$Feed\+Forward\+Network.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classFeedForwardNetwork_a2f714c43ff596c5342aec449644a6709}{Feed\+Forward\+Network} (std\+::vector$<$ int $>$ layersizes)
+\begin{DoxyCompactList}\small\item\em Default constructor of Feed Forward Network. \end{DoxyCompactList}\item 
+Mat1f \hyperlink{classFeedForwardNetwork_a17eb3563391ca5aecdff73d538e33f91}{use} (Mat1f in)
+\begin{DoxyCompactList}\small\item\em Function to use a trained network. \end{DoxyCompactList}\item 
+void \hyperlink{classFeedForwardNetwork_a369f0c708a65b6eb7cf2b65d439fb5ce}{train\+Batch} (std\+::vector$<$ std\+::pair$<$ Mat1f, Mat1f $>$$>$ batch)
+\begin{DoxyCompactList}\small\item\em Function to train the network in batches. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classFeedForwardNetwork_a967b1a02a28fab0dfffec47489d64e21}\label{classFeedForwardNetwork_a967b1a02a28fab0dfffec47489d64e21}} 
+void \hyperlink{classFeedForwardNetwork_a967b1a02a28fab0dfffec47489d64e21}{print} ()
+\begin{DoxyCompactList}\small\item\em Function that prints the weights and biases of the network. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class for standard Feed Forward Neural Network. 
+
+This class uses backpropagation to train a function to match input vectors to output vectors. Input vectors can be anything from images to true or false statements. Input has to be normalized to be between 0 and 1. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFeedForwardNetwork_a2f714c43ff596c5342aec449644a6709}\label{classFeedForwardNetwork_a2f714c43ff596c5342aec449644a6709}} 
+\index{Feed\+Forward\+Network@{Feed\+Forward\+Network}!Feed\+Forward\+Network@{Feed\+Forward\+Network}}
+\index{Feed\+Forward\+Network@{Feed\+Forward\+Network}!Feed\+Forward\+Network@{Feed\+Forward\+Network}}
+\subsubsection{\texorpdfstring{Feed\+Forward\+Network()}{FeedForwardNetwork()}}
+{\footnotesize\ttfamily Feed\+Forward\+Network\+::\+Feed\+Forward\+Network (\begin{DoxyParamCaption}\item[{std\+::vector$<$ int $>$}]{layersizes }\end{DoxyParamCaption})}
+
+
+
+Default constructor of Feed Forward Network. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em layersizes} & a vector which indicates the number of nodes per layer, 0 indexed. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classFeedForwardNetwork_a369f0c708a65b6eb7cf2b65d439fb5ce}\label{classFeedForwardNetwork_a369f0c708a65b6eb7cf2b65d439fb5ce}} 
+\index{Feed\+Forward\+Network@{Feed\+Forward\+Network}!train\+Batch@{train\+Batch}}
+\index{train\+Batch@{train\+Batch}!Feed\+Forward\+Network@{Feed\+Forward\+Network}}
+\subsubsection{\texorpdfstring{train\+Batch()}{trainBatch()}}
+{\footnotesize\ttfamily void Feed\+Forward\+Network\+::train\+Batch (\begin{DoxyParamCaption}\item[{std\+::vector$<$ std\+::pair$<$ Mat1f, Mat1f $>$$>$}]{batch }\end{DoxyParamCaption})}
+
+
+
+Function to train the network in batches. 
+
+Takes as input a vector of pairs, which are a input and asociated output. \mbox{\Hypertarget{classFeedForwardNetwork_a17eb3563391ca5aecdff73d538e33f91}\label{classFeedForwardNetwork_a17eb3563391ca5aecdff73d538e33f91}} 
+\index{Feed\+Forward\+Network@{Feed\+Forward\+Network}!use@{use}}
+\index{use@{use}!Feed\+Forward\+Network@{Feed\+Forward\+Network}}
+\subsubsection{\texorpdfstring{use()}{use()}}
+{\footnotesize\ttfamily Mat1f Feed\+Forward\+Network\+::use (\begin{DoxyParamCaption}\item[{Mat1f}]{in }\end{DoxyParamCaption})}
+
+
+
+Function to use a trained network. 
+
+Takes as input a vector of predefined size and outputs another vector of a different also predetermined size. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/raphael/\+C\+Lion\+Projects/\+N\+N0.\+1/\+Cpp\+Files/Feed\+Forward\+Network.\+h\item 
+/home/raphael/\+C\+Lion\+Projects/\+N\+N0.\+1/\+Cpp\+Files/Feed\+Forward\+Network.\+cpp\end{DoxyCompactItemize}

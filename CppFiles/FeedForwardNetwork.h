@@ -9,7 +9,7 @@ using namespace cv;
 /*!
  * This class uses backpropagation to train a function to match input vectors to output vectors.
  * Input vectors can be anything from images to true or false statements.
- * Input has to be normalized to be between 0 and 1.
+ * Input does not have to be normalized. Output is given in form of a vector containing values between 0 and 1.
  */
 
 class FeedForwardNetwork{
@@ -50,6 +50,15 @@ public:
     //! Function to train the network in batches.
     /*! Takes as input a vector of pairs, which are a input and asociated output.*/
     void trainBatch(std::vector<std::pair<Mat1f,Mat1f>> batch);
+
+    //!Function to train the network sample after sample.
+    /*!
+     * Takes as input a input and asociated desired output.
+     * @param in Collumnmatrix with the input.
+     * @param out Collumnmatrix with the associated output.
+     */
+
+    void trainSingle(Mat1f in, Mat1f out);
 
     //! Function that prints the weights and biases of the network.
     void print();

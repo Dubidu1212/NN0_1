@@ -3,6 +3,9 @@
 
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    FeedForwardNetwork ffn({2,3,3,2,1});
+    ffn.print();
+
+
     return 0;
 }

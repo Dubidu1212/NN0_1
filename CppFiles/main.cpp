@@ -3,7 +3,7 @@
 
 
 int main() {
-    FeedForwardNetwork ffn({2,3,3,2,1});
+    FeedForwardNetwork ffn({2,3,3,2,1},0.1);
     ffn.print();
 
 

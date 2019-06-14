@@ -1,8 +1,9 @@
 #ifndef NN0_1_FEEDFORWARDNETWORK_H
 #define NN0_1_FEEDFORWARDNETWORK_H
 
-#include <opencv2/opencv.hpp>
+
 #include "helperFunctions.h"
+
 
 using namespace cv;
 //! Class for standard Feed Forward Neural Network
@@ -23,7 +24,7 @@ private:
 
     //! Container of all weights of the Neural Network.
     /*! Vector contains int layers Weightmatrices
-     *  Matrix in layer i has dimensions \e layerTemplate[i+1] * \e layerTemplate[i]
+     *  Matrix in layer i has dimensions rows*columns \e layerTemplate[i+1] * \e layerTemplate[i]
      */
     std::vector<Mat1f> w;
 
@@ -32,16 +33,18 @@ private:
     std::vector<int> layerTemplate;
 
 
-
     //! Number of layers of network.
     int layers;
+
+    //!Factor with which the the gradient is applied lambda
+    float lambda;
 public:
 
     //! Default constructor of Feed Forward Network
     /*! @param layersizes a vector which indicates the number of nodes per layer, 0 indexed.
-     *
+     *  @param l training value lambda.
      */
-    FeedForwardNetwork(std::vector<int> layersizes);
+    FeedForwardNetwork(std::vector<int> layersizes,float l);
 
     //! Function to use a trained network.
     /*! Takes as input a vector of predefined size and outputs another vector of a different also predetermined size.*/

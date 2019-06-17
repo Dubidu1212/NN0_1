@@ -5,7 +5,8 @@
 Mat1f FeedForwardNetwork::use(Mat1f in){
     for(int layer = 0;layer < layers-1;layer++){
         in+=b[layer];
-        in*=w[layer];
+        in = w[layer]*in;
+
         eWMOp(in,sigmoid);
 
     }
@@ -39,14 +40,14 @@ void FeedForwardNetwork::trainSingle(Mat1f in, Mat1f out) {
     std::vector<Mat1f> Eb = copyDimVec(b);
 
 
-    for(int layer = layers-1;layer>=0;layer++){
+    for(int layer = layers-1;layer>=0;layer--){
         if(layer == layers-1){
             //Last layer to Error
             En[layer] = 2*(nodeHistory[layer]-out);// d(Error)/d(postsig)
         }
         else{
             Mat1f dsig;//Vector d(postisg)/d(präsig) == d(nodeHistory[i])/d(präsigHistory[i])
-            dsig = praesigHistory[layer].clone();
+            dsig = praesigHistory[layer+1].clone();//maybe only layer
             eWMOp(dsig,sigmoidPrime);
 
             Mat1f dErr = En[layer+1].mul(dsig);// d(Error)/d(Postsig) * d(postsig)/d(präsig) = d(Error)/d(Präsig)
@@ -55,7 +56,7 @@ void FeedForwardNetwork::trainSingle(Mat1f in, Mat1f out) {
 
             En[layer] = w[layer].t() * dErr;//maybe clone
             Eb[layer] = w[layer].t() * dErr;
-            Ew[layer] = (b[layer]+nodeHistory[layer])*dErr.t();
+            Ew[layer] = dErr* (b[layer]+nodeHistory[layer]).t();
 
 
 
@@ -67,8 +68,11 @@ void FeedForwardNetwork::trainSingle(Mat1f in, Mat1f out) {
     //Move in direction of negative gradient
 
     for(int layer = 0;layer < layers;layer++){
-        w[layer]-=(Ew[layer]*lambda);
         b[layer]-=(Eb[layer]*lambda);
+        if(layer < layers-1){
+            w[layer]-=(Ew[layer]*lambda);
+        }
+
     }
 
 

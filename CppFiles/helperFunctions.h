@@ -28,6 +28,9 @@ std::vector<Mat1f> copyVec(std::vector<Mat1f> in);/*!<
 std::vector<Mat1f> copyDimVec(std::vector<Mat1f> in,float fillVal = 0);
 float sigmoid(float in); /*!< Sigmoid activation function */
 float sigmoidPrime(float in);/*!< Derivative of sigmoid function */
-
+//!Rectified linear Unit: returns max(x,0)
+float ReLU(float in);
+//!Derivative of ReLU
+float dReLU(float in);
 
 #endif //NN0_1_HELPERFUNCTIONS_H

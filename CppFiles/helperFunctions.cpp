@@ -20,6 +20,7 @@ void eWMOp(Mat1f &in, float (*op)(float)) {
     }
 }
 
+
 float sigmoid(float in) {
     return 1/(1+exp(in*-1));
 }
@@ -44,6 +45,22 @@ std::vector<Mat1f> copyDimVec(std::vector<Mat1f> in,float fillVal) {
         retVec.emplace_back(Mat1f(in[i].rows,in[i].cols,fillVal));//maybe push_back
     }
     return retVec;
+}
+
+float ReLU(float in) {
+    return std::max(in,0.0f);
+}
+
+float dReLU(float in) {
+    if(in < 0){
+        return 0;
+    }
+    else if(in == 0){
+        return 0.5;//this value is arbitrary
+    }
+    else{
+        return 1;
+    }
 }
 
 

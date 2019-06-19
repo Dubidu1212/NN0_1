@@ -5,6 +5,7 @@
 
 
 std::vector<Mat1f> ConvolutionalLayer::use(std::vector<Mat1f> vec) {
+    inputHistory = copyVec(vec);
     std::vector<Mat1f> out;
     OutInMapping.resize(vec.size()*filters.size());
     int counter = 0;
@@ -25,6 +26,7 @@ std::vector<Mat1f> ConvolutionalLayer::use(std::vector<Mat1f> vec) {
 }
 
 std::vector<Mat1f> ConvolutionalLayer::ownUse(std::vector<Mat1f> vec) {
+    inputHistory = copyVec(vec);
     OutInMapping.resize(vec.size()*filters.size());
     int counter = 0;
     std::vector<Mat1f> out;
@@ -57,4 +59,41 @@ std::vector<Mat1f> ConvolutionalLayer::ownUse(std::vector<Mat1f> vec) {
     }
 
     return out;
+}
+
+ConvolutionalLayer::ConvolutionalLayer(int filterSize, int numFilters) {
+    for(int f = 0;f<numFilters;f++){
+        Mat1f filter = Mat1f(filterSize,filterSize);
+        randu(filter,Scalar(-1),Scalar(1));
+        filters.push_back(filter.clone());
+    }
+
+}
+
+std::vector<Mat1f> ConvolutionalLayer::dErr(std::vector<Mat1f> in) {
+
+
+}
+
+Mat1f ConvolutionalLayer::IndOutSingle(int outMat) {
+    //this is probably very slow
+    Mat1f filter = filters[OutInMapping[outMat].second];
+    Mat1f in = inputHistory[OutInMapping[outMat].first];
+    Mat1f out = Mat1f(in.rows,in.cols,0.0f);
+
+    for(int r = 0;r < in.rows-filterSize+1;r++){
+        for(int c = 0;c<in.rows-filterSize+1;c++){
+
+            for(int fr = 0;fr<filterSize;fr++){
+                for(int fc = 0;fc <filterSize;fc++){
+                    out.at<float>(r+fr,c+fc) += filter.at<float>(fr,fc);
+                }
+            }
+
+        }
+    }
+}
+
+Mat1f ConvolutionalLayer::FilterdOut(int outMat) {
+    //TODO: find way to include all errors produced by filter not only those in outMat
 }

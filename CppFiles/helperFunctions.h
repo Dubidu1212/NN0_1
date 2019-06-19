@@ -10,7 +10,7 @@ using namespace cv;
 
 void addNumToVec(std::vector<Mat1f> in, float num);/*!<Adds a float to each element of each matrix in a vector*/
 //static void eWVOp(std::vector<Mat1f> in, float (op)(float));/*!< Elementwise vector operation */
-//TODO: check whether operator type has to be changed.
+//TODO: check whether operator type has to be changed. to adapt for Mat3f
 void eWMOp(Mat1f &in, float (op)(float)); /*!< Elementwise matrix operation */
 std::vector<Mat1f> copyVec(std::vector<Mat1f> in);/*!<
  * Copies a Vector of Matrices.

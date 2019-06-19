@@ -5,7 +5,7 @@
 
 
 //! Superclass of all neural network layers
-class NetworkLayer {//TODO: subclass this to make different layers like convolutional and relu etc.
+class NetworkLayer {
     //TODO: make general so it is possible to put in a Mat3f
     //! Takes as a input a Matrix and applies the layers operator on it
     virtual std::vector<Mat1f> use(std::vector<Mat1f> in) = 0;

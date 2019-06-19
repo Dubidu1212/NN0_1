@@ -1,13 +1,21 @@
 #include "ReLULayer.h"
 
-Mat1f ReLULayer::use(Mat1f in) {
-    eWMOp(in,ReLU);
-    return in;
+
+std::vector<Mat1f> ReLULayer::use(std::vector<Mat1f> in) {
+    std::vector<Mat1f> out;
+    for(Mat1f mat : in){
+        eWMOp(mat,ReLU);
+        out.push_back(mat.clone());
+    }
+    return out;
+
 }
 
-Mat1f ReLULayer::dErr(Mat1f in) {
-    eWMOp(in,dReLU);
-    return in;
+std::vector<Mat1f> ReLULayer::dErr(std::vector<Mat1f> in) {
+    std::vector<Mat1f> out;
+    for(Mat1f mat : in){
+        eWMOp(mat,dReLU);
+        out.push_back(mat.clone());
+    }
+    return out;
 }
-
-

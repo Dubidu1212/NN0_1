@@ -7,7 +7,7 @@
 
 #include <string>
 
-enum layerType {Convolutional,ReLU, Maxpool, FullyConnected};
+enum layerType {ConvolutionalLayer,ReLULayer, MaxpoolLayer, FullyConnectedLayer};
 struct layerTemplate{
 
 
@@ -31,7 +31,7 @@ struct layerTemplate{
     //!Number of filters
     int numFilters;
     //!Stride of the filter
-    int CStride;
+    int CStride = 1;
 
 
 

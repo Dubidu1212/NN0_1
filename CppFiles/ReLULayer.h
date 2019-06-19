@@ -5,8 +5,8 @@
 
 class ReLULayer : public NetworkLayer {
     //!Sets all values of the matrix smaller than 0 to 0 **Important! use cloned matrix**
-    Mat1f use(Mat1f in);
-    Mat1f dErr(Mat1f in);
+    std::vector<Mat1f> use(std::vector<Mat1f> in);
+    std::vector<Mat1f> dErr(std::vector<Mat1f> in);
 
 };
 

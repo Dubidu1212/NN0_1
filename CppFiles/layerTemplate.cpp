@@ -1,7 +1,7 @@
 #include "layerTemplate.h"
 
 layerTemplate::layerTemplate(int t, int fS, int nF, int s) {
-    if(t != Convolutional){
+    if(t != ConvolutionalLayer){
         throw "Wrong layerTemplate Initializer: used initializer 'Convolutional'";
     }
     filterSize = fS;
@@ -13,14 +13,14 @@ layerTemplate::layerTemplate(int t, int fS, int nF, int s) {
 }
 
 layerTemplate::layerTemplate(int t) {
-    if(t != ReLU){
+    if(t != ReLULayer){
         throw "Wrong layerTemplate Initializer: used initializer 'ReLU'";
     }
 
 }
 
 layerTemplate::layerTemplate(int t,int pS, int s) {
-    if(t != Maxpool){
+    if(t != MaxpoolLayer){
         throw "Wrong layerTemplate Initializer: used initializer 'Maxpool'";
     }
     poolingSize = pS;
@@ -29,7 +29,7 @@ layerTemplate::layerTemplate(int t,int pS, int s) {
 }
 
 layerTemplate::layerTemplate(int t, int s) {
-    if(t != FullyConnected){
+    if(t != FullyConnectedLayer){
         throw "Wrong layerTemplate Initializer: used initializer 'Maxpool'";
     }
     size = s;

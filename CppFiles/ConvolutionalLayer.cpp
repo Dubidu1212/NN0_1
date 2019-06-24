@@ -70,19 +70,16 @@ ConvolutionalLayer::ConvolutionalLayer(int filterSize, int numFilters) {
 
 }
 
-std::vector<Mat1f> ConvolutionalLayer::dErr(std::vector<Mat1f> in) {
 
 
-}
-
-Mat1f ConvolutionalLayer::IndOutSingle(int outMat) {
+Mat1f ConvolutionalLayer::OutdInSingle(int outMat) {
     //this is probably very slow
     Mat1f filter = filters[OutInMapping[outMat].second];
     Mat1f in = inputHistory[OutInMapping[outMat].first];
     Mat1f out = Mat1f(in.rows,in.cols,0.0f);
 
     for(int r = 0;r < in.rows-filterSize+1;r++){
-        for(int c = 0;c<in.rows-filterSize+1;c++){
+        for(int c = 0;c<in.cols-filterSize+1;c++){
 
             for(int fr = 0;fr<filterSize;fr++){
                 for(int fc = 0;fc <filterSize;fc++){
@@ -92,8 +89,46 @@ Mat1f ConvolutionalLayer::IndOutSingle(int outMat) {
 
         }
     }
+    return out;//maybe clone
 }
 
-Mat1f ConvolutionalLayer::FilterdOut(int outMat) {
-    //TODO: find way to include all errors produced by filter not only those in outMat
+
+
+std::vector<Mat1f> ConvolutionalLayer::OutdIn() {
+    std::vector<Mat1f> out;
+    for(int outmat = 0;outmat<OutInMapping.size();outmat++){
+        out.push_back(OutdInSingle(outmat));//maybe clone
+    }
+
+    return out;
+}
+
+std::vector<Mat1f> ConvolutionalLayer::ErrdFilter(){//maybe make d Err
+    std::vector<Mat1f> out;
+    for(int f = 0;f<filters.size();f++){
+        Mat1f err = nextLayerErr[f];
+        for(int mat = 1;mat<inputHistory.size();mat++){
+            //f+mat*filters.size() = all outputmats processed with this filter
+
+            err += nextLayerErr[f+mat*filters.size()];
+        }
+        //filter error
+        Mat1f ferr = Mat1f(filterSize,filterSize);
+        //can convolute the filter over the error saving to the filter all the errors it touched summing
+        //probaly slow
+        //can combine with OutdIn to make it more efficent (*2)
+        for(int r = 0;r<err.rows-filterSize+1;r++){
+            for(int c = 0;c<err.cols-filterSize+1;c++){
+
+                for(int fr = 0;fr<filterSize;fr++){
+                    for(int fc = 0;fc<filterSize;fc++){
+                        ferr.at<float>(fr,fc) += err.at<float>(r+fr,c+fc);
+                    }
+                }
+
+            }
+        }
+        out.push_back(ferr.clone());
+    }
+    return out;
 }

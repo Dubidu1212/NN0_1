@@ -1,0 +1,1 @@
+Make all batch trainable so a batch of size 1 can be used so it is possible to have a stochastic gradient descent

@@ -13,7 +13,7 @@ class ConvolutionalLayer:public NetworkLayer {
      */
     ConvolutionalLayer(int filterSize,int numFilters);
 
-    std::vector<Mat1f> dErr(std::vector<Mat1f> in);
+
 
     //!finds d(out)/d(in) of a single mat
     /*!
@@ -26,8 +26,11 @@ class ConvolutionalLayer:public NetworkLayer {
     //!Returns d(out)/d(in) for the whole layer
     std::vector<Mat1f> OutdIn();//TODO: make general by naming functions the same as in NetowrkLayer.h
 
-    //!Returns d(out)/d(err)
-    std::vector<Mat1f> ErrdFilter();//TODO: combine with outdin
+    //!computes and saves d(out)/d(err)
+    void ErrdFilter();//TODO: combine with outdin
+
+    //!applies the error accumulated after a batch
+    void applyError();
 
     //! applies convolution to this layer using the opencv method which is fast due to fast fourier
     std::vector<Mat1f> use(std::vector<Mat1f> in);
@@ -58,7 +61,11 @@ class ConvolutionalLayer:public NetworkLayer {
     std::vector<std::pair<int,int>> OutInMapping;//TODO: remove to save performance
 
     std::vector<Mat1f> inputHistory;
+    //! error of the next layer
     std::vector<Mat1f> nextLayerErr;//TODO: initialize
+
+    //!here the errors get sumed up until they get applied in applyError()
+    std::vector<Mat1f> errorAccumulate;//TODO:initialize
 
 };
 

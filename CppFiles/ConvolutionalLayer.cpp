@@ -5,6 +5,10 @@
 
 
 std::vector<Mat1f> ConvolutionalLayer::use(std::vector<Mat1f> vec) {
+    //initializes input dimension rows and cols
+    inputDimensionsRows = vec[0].rows;
+    inputDimensionsCols = vec[0].cols;
+
     inputHistory = copyVec(vec);
     std::vector<Mat1f> out;
     OutInMapping.resize(vec.size()*filters.size());
@@ -26,6 +30,10 @@ std::vector<Mat1f> ConvolutionalLayer::use(std::vector<Mat1f> vec) {
 }
 
 std::vector<Mat1f> ConvolutionalLayer::ownUse(std::vector<Mat1f> vec) {
+    //initializes input dimension rows and cols
+    inputDimensionsRows = vec[0].rows;
+    inputDimensionsCols = vec[0].cols;
+
     inputHistory = copyVec(vec);
     OutInMapping.resize(vec.size()*filters.size());
     int counter = 0;
@@ -62,17 +70,21 @@ std::vector<Mat1f> ConvolutionalLayer::ownUse(std::vector<Mat1f> vec) {
 }
 
 ConvolutionalLayer::ConvolutionalLayer(int filterSize, int numFilters) {
+    //initialize filters
     for(int f = 0;f<numFilters;f++){
         Mat1f filter = Mat1f(filterSize,filterSize);
         randu(filter,Scalar(-1),Scalar(1));
         filters.push_back(filter.clone());
     }
 
+    //initialize errorAccumulate
+    errorAccumulate = std::vector<Mat1f>(numFilters);
+
 }
 
 
 
-Mat1f ConvolutionalLayer::OutdInSingle(int outMat) {//TODO: make d(err)/d(in) instead of d(out)/d(in)
+Mat1f ConvolutionalLayer::ErrdInSingle(int outMat) {
     //this is probably very slow
     Mat1f filter = filters[OutInMapping[outMat].second];
     Mat1f in = inputHistory[OutInMapping[outMat].first];
@@ -89,21 +101,26 @@ Mat1f ConvolutionalLayer::OutdInSingle(int outMat) {//TODO: make d(err)/d(in) in
 
         }
     }
-    return out;//maybe clone
+
+    //includes err
+    return out.mul(nextLayerErr[outMat]);
 }
 
 
 
-std::vector<Mat1f> ConvolutionalLayer::OutdIn() {//TODO: make d(err)/d(in) instead of d(out)/d(in)
-    std::vector<Mat1f> out;
+std::vector<Mat1f> ConvolutionalLayer::dErr(std::vector<Mat1f> in){
+
+    std::vector<Mat1f> ErrdIn = std::vector<Mat1f>(OutInMapping.size()/filters.size(),Mat1f(inputDimensionsRows,inputDimensionsCols,0.0f));
     for(int outmat = 0;outmat<OutInMapping.size();outmat++){
-        out.push_back(OutdInSingle(outmat));//maybe clone
+
+        ErrdIn[OutInMapping[outmat].first] += ErrdInSingle(outmat);
+
     }
 
 
     ErrdFilter();
 
-    return out;
+    return ErrdIn;
 }
 
 void ConvolutionalLayer::ErrdFilter(){
@@ -141,5 +158,6 @@ void ConvolutionalLayer::applyError() {
     for(int f = 0;f<filters.size();f++){
         filters[f]+= errorAccumulate[f]*lambda;
     }
+    errorAccumulate = std::vector<Mat1f>(filters.size(),Mat1f(filterSize,filterSize,0.0f));
 
 }

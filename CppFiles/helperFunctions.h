@@ -33,4 +33,14 @@ float ReLU(float in);
 //!Derivative of ReLU
 float dReLU(float in);
 
+//!Reverses an int. Copied from: http://eric-yuan.me/cpp-read-mnist/
+int ReverseInt(int in);
+
+//!Reads the Mnist database into a vec<mat>. Copied from: http://eric-yuan.me/cpp-read-mnist/
+void read_Mnist(std::string filename,std::vector<Mat> &vec);
+
+//!Reads the Mnist database labels into a vec<double>. Copied from: http://eric-yuan.me/cpp-read-mnist/
+void read_Mnist_Label(std::string filename,std::vector<double> &vec);
+
+
 #endif //NN0_1_HELPERFUNCTIONS_H

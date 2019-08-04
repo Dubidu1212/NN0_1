@@ -9,15 +9,20 @@ class NetworkLayer {
     //!value with which the training speed is determined
 public:
     float lambda;
+
+    //!Accumulates error until applied in applyError
+    std::vector<Mat1f> errorAccumulate;
+
     //TODO: make general so it is possible to put in a Mat3f
     //! Takes as a input a Matrix and applies the layers operator on it
     virtual std::vector<Mat1f> use(std::vector<Mat1f> in) = 0;
 
-    //! Gives d(out)/d(in) of this layer while calculating the error on the layer
+    //! Gives d(err)/d(in) of this layer while calculating the error on the layer and putting it into erroracumulate
     virtual std::vector<Mat1f> dErr(std::vector<Mat1f> in) = 0;
 
     //! applies the saved errors. Should be used after the whole batch has accumulated dErr's
     virtual void applyError() = 0;
+
 
 };
 

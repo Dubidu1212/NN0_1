@@ -21,10 +21,10 @@ class ConvolutionalLayer:public NetworkLayer {
      * @param outMat position in the output vector of the matrix
      * @return returns d(out)/d(in)
      */
-    Mat1f OutdInSingle(int outMat);
+    Mat1f ErrdInSingle(int outMat);
 
     //!Returns d(out)/d(in) for the whole layer
-    std::vector<Mat1f> OutdIn();//TODO: make general by naming functions the same as in NetowrkLayer.h
+    std::vector<Mat1f> dErr(std::vector<Mat1f> in);//TODO: make general by naming functions the same as in NetowrkLayer.h
 
     //!computes and saves d(out)/d(err)
     void ErrdFilter();//TODO: combine with outdin
@@ -44,7 +44,8 @@ class ConvolutionalLayer:public NetworkLayer {
 
     //!Maps a given output matrix to a filter and a input matrix
     /*!
-     * at position i of OutInMapping there is a pair of ints.
+     *
+     * At position i of OutInMapping there is a pair of ints.
      *
      * The first int indicates the position of the input matrix in the input vector
      *
@@ -61,12 +62,18 @@ class ConvolutionalLayer:public NetworkLayer {
     std::vector<std::pair<int,int>> OutInMapping;//TODO: remove to save performance
 
     std::vector<Mat1f> inputHistory;
+
     //! error of the next layer
-    std::vector<Mat1f> nextLayerErr;//TODO: initialize
+    std::vector<Mat1f> nextLayerErr;//TODO: initialize. Has to be set by the class containing all the layers
 
-    //!here the errors get sumed up until they get applied in applyError()
-    std::vector<Mat1f> errorAccumulate;//TODO:initialize
+    //!here the errors get summed up until they get applied in applyError()
+    std::vector<Mat1f> errorAccumulate;
 
+    //!The Rows of the input processed in this layer. Is initialized only after usage
+    int inputDimensionsRows;
+
+    //!Number of Cols of the input processed in this layer. Is initialized only after usage of layer.
+    int inputDimensionsCols;
 };
 
 

@@ -66,6 +66,11 @@ public:
     //! Function that prints the weights and biases of the network.
     void print();
 
+    //!saves the network to a file
+    void save(std::string filename);
+
+    FeedForwardNetwork(std::string filename);
+
 };
 
 #endif //NN0_1_FEEDFORWARDNETWORK_H

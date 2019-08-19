@@ -31,9 +31,10 @@ float sigmoidPrime(float in) {
 
 std::vector<Mat1f> copyVec(std::vector<Mat1f> in) {
     //TODO: make pointer
-    std::vector<Mat1f> retVec;
+    std::vector<Mat1f> retVec = std::vector<Mat1f>(in.size());
     for(int x = 0;x<in.size();x++){
-        retVec.push_back(in[x].clone());
+
+        retVec[x] = in[x].clone();
     }
 
     return retVec;
@@ -51,6 +52,7 @@ float ReLU(float in) {
     return std::max(in,0.0f);
 }
 
+//TODO: this is worng because relu is not dependant on output but on input!
 float dReLU(float in) {
     if(in < 0){
         return 0;
@@ -126,4 +128,5 @@ void read_Mnist_Label(std::string filename, std::vector<double> &vec)
         }
     }
 }
+
 

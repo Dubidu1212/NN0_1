@@ -5,15 +5,10 @@
 
 class ConvolutionalLayer:public NetworkLayer {
 
-    //!Initializer for Convolutional Layer
-    /*!
-     *
-     * @param filterSize Size of the filters in this layer
-     * @param numFilters Number of filters in this layer
-     */
-    ConvolutionalLayer(int filterSize,int numFilters);
+public:
 
-
+    //!number of times the error hasnt been applied
+    int passes = 0;
 
     //!finds d(out)/d(in) of a single mat
     /*!
@@ -27,6 +22,7 @@ class ConvolutionalLayer:public NetworkLayer {
     std::vector<Mat1f> dErr(std::vector<Mat1f> in);//TODO: make general by naming functions the same as in NetowrkLayer.h
 
     //!computes and saves d(out)/d(err)
+
     void ErrdFilter();//TODO: combine with outdin
 
     //!applies the error accumulated after a batch
@@ -61,6 +57,7 @@ class ConvolutionalLayer:public NetworkLayer {
      */
     std::vector<std::pair<int,int>> OutInMapping;//TODO: remove to save performance
 
+    //!The last input
     std::vector<Mat1f> inputHistory;
 
     //! error of the next layer
@@ -74,6 +71,15 @@ class ConvolutionalLayer:public NetworkLayer {
 
     //!Number of Cols of the input processed in this layer. Is initialized only after usage of layer.
     int inputDimensionsCols;
+public:
+    //!Initializer for Convolutional Layer
+    /*!
+     *
+     * @param filterSize Size of the filters in this layer
+     * @param numFilters Number of filters in this layer
+     * @param lambda learning rate
+     */
+    ConvolutionalLayer(int filterSize,int numFilters,float lambda);
 };
 
 

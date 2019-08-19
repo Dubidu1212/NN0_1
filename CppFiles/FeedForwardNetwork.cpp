@@ -179,6 +179,7 @@ FeedForwardNetwork::FeedForwardNetwork(std::string filename){
     assert(test == 'b');
 
 
+    //biases
     int bs;
     in >> bs;
     for(int x = 0;x<bs;x++){

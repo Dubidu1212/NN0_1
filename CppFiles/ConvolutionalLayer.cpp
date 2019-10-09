@@ -189,7 +189,12 @@ void ConvolutionalLayer::applyError() {
 
         filters[f] -= (errorAccumulate[f]/(passes*filterSize*filterSize))*lambda;
 
+        /*
+        double min, max;
+        cv::minMaxLoc(filters[f], &min, &max);
 
+        //keeps values between -1 and 1
+        filters[f]/=std::max(-min,max);*/
 
         /*
         namedWindow("filters",WINDOW_NORMAL);
@@ -207,4 +212,9 @@ void ConvolutionalLayer::applyError() {
 
 
 
+}
+
+std::tuple<int, int, int> ConvolutionalLayer::outputSize(std::tuple<int, int, int> in) {
+
+    return std::make_tuple(std::get<0>(in)-(this->filterSize-1),std::get<1>(in)-(this->filterSize-1),std::get<2>(in)*this->filters.size());
 }

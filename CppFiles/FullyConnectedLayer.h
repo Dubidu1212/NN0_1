@@ -37,6 +37,7 @@ public:
     std::vector<Mat1f> use(std::vector<Mat1f> in) override ;
     std::vector<Mat1f> dErr(std::vector<Mat1f> in) override;
     FullyConnectedLayer(int nodes,int inputSize,float lambda,std::string activationFunction);
+    std::tuple<int,int,int> outputSize(std::tuple<int,int,int> in);
 
     void applyError() override;
 };

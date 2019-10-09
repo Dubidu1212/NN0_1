@@ -34,3 +34,7 @@ ReLULayer::ReLULayer() {
     layerType = "ReLU";
     return;
 }
+
+std::tuple<int, int, int> ReLULayer::outputSize(std::tuple<int, int, int> in) {
+    return in;
+}

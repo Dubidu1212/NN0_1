@@ -110,3 +110,7 @@ void MaxPoolLayer::applyError() {
     //no error to apply
     return;
 }
+
+std::tuple<int, int, int> MaxPoolLayer::outputSize(std::tuple<int,int,int> in) {//not sure whether it works
+    return std::make_tuple(std::ceil(std::get<0>(in)/2.0f),std::ceil(std::get<1>(in)/2.0f),std::get<2>(in));
+}

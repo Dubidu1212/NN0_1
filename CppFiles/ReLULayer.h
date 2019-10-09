@@ -10,6 +10,7 @@ class ReLULayer : public NetworkLayer {
     std::vector<Mat1f> dErr(std::vector<Mat1f> in);
     void applyError();
 
+    std::tuple<int,int,int> outputSize(std::tuple<int,int,int> in);
     std::vector<Mat1f> inputHistory;
 
 public:

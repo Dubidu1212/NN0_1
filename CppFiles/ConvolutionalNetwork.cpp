@@ -3,12 +3,24 @@
 #include "ReLULayer.h"
 #include "ConvolutionalLayer.h"
 #include "FullyConnectedLayer.h"
+#include "DropoutLayer.h"
 
 Mat1f ConvolutionalNetwork::use(Mat1f in) {
+
+    if(in.rows != this->input_heigth || in.cols != this->input_width){
+        std::cerr << "Inputsize and used Mat don't match up!" << std::endl;
+        std::cerr << "Input sizes where:" << this->input_heigth << " " << this->input_width << std::endl;
+        std::cerr << "But mat size was:" << in.rows << " " << in.cols << std::endl;
+        assert(false);
+    }
+
+
+
     std::vector<Mat1f> runtimeMatVec = std::vector<Mat1f>(1);
     runtimeMatVec[0] = in.clone();
     for(int l = 0;l<layers.size();l++){
         runtimeMatVec = layers[l]->use(runtimeMatVec);
+
 
     }
     return runtimeMatVec[0];//only works if last layer is fully connected
@@ -17,8 +29,12 @@ Mat1f ConvolutionalNetwork::use(Mat1f in) {
 void ConvolutionalNetwork::dErr(Mat1f error) {
     std::vector<Mat1f> runtimeError = std::vector<Mat1f>(0);
     runtimeError.push_back(error.clone());
+
     for(int l = layers.size()-1;l>=0;l--){
         runtimeError = layers[l]->dErr(runtimeError);
+
+
+
     }
 }
 
@@ -29,21 +45,37 @@ void ConvolutionalNetwork::applyError() {
 }
 
 ConvolutionalNetwork::ConvolutionalNetwork(int input_width, int input_height, int num_classes, float lambda, std::string lossFunction) {
+    log.open(logfile,std::ofstream::out | std::ofstream::app);
+    log << "--------------------------------------------------------" << std::endl;
+    log.close();
+
+
     this->lossFunction = lossFunction;
     this->input_width = input_width;
     this->input_heigth = input_height;
     this->num_classes = num_classes;
     this->lambda = lambda;
+
+
+
 }
 
 void ConvolutionalNetwork::wholePropagation(Mat1f in, Mat1f desiredOutput) {
     propagations++;
     if(lossFunction == "MSE"){
         Mat1f Error = (use(in)-desiredOutput)*2;
+        //std::cout << Error << "\n" << use(in) << "\n---------------"<< std::endl;
+        if(propagations%32==0){
+            log.open(logfile,std::ofstream::out | std::ofstream::app);
+            log << Error << std::endl;
+            log << "Error: "<<sum((Error/2).mul((Error/2)))[0] << std::endl;
+            log.close();
+        }
         dErr(Error);
     }
     else if(lossFunction == "CrossEntropy"){
         Mat1f Error = (use(in)-desiredOutput);
+
         dErr(Error);
     }
     else{
@@ -53,8 +85,9 @@ void ConvolutionalNetwork::wholePropagation(Mat1f in, Mat1f desiredOutput) {
 }
 
 void ConvolutionalNetwork::save(std::string filename) {
+    std::cout << "Saving to:" << filename << std::endl;
     std::ofstream sf(filename);
-
+    //sf << lossFunction << std::endl;//TODO:uncomment
     sf << input_width << std::endl;
     sf << input_heigth << std::endl;
     sf << num_classes << std::endl;
@@ -65,7 +98,7 @@ void ConvolutionalNetwork::save(std::string filename) {
         std::string layerType = layers[l]->layerType;
         sf <<  layerType<< std::endl;
         if(layerType == "MaxPool"){
-            MaxPoolLayer* layer = static_cast<MaxPoolLayer*>(layers[l]);
+            MaxPoolLayer* layer = static_cast<MaxPoolLayer*>(layers[l].get());
             sf << layer->s << std::endl;
             sf << layer->poolSize << std::endl;
         }
@@ -73,7 +106,7 @@ void ConvolutionalNetwork::save(std::string filename) {
 
         }
         else if(layerType == "FullyConnected"){
-            FullyConnectedLayer* layer = static_cast<FullyConnectedLayer*>(layers[l]);
+            FullyConnectedLayer* layer = static_cast<FullyConnectedLayer*>(layers[l].get());
 
             sf << layer->activationFunction << std::endl;
 
@@ -101,7 +134,7 @@ void ConvolutionalNetwork::save(std::string filename) {
 
         }
         else if(layerType == "Convolutional"){
-            ConvolutionalLayer* layer = static_cast<ConvolutionalLayer*>(layers[l]);
+            ConvolutionalLayer* layer = static_cast<ConvolutionalLayer*>(layers[l].get());
 
 
 
@@ -127,15 +160,34 @@ void ConvolutionalNetwork::save(std::string filename) {
             }
 
         }
+        else if(layerType == "Dropout"){
+            DropoutLayer* layer = static_cast<DropoutLayer*>(layers[l].get());
+            sf << layer->reloadPeriod << std::endl;
+            sf << layer->dropoutPercentage << std::endl;
+
+            int a,b,c;
+
+            std::tie(a,b,c) = layer->inputDim;
+
+            sf << a << " " << b << " " << c << std::endl;
+        }
         else{
             std::cerr << "Fatal error while saving Network: LayerType <" << layerType << "> doesn't exist" << std::endl;
             assert(false);
         }
     }
+    std::cout << "Finished saving" << std::endl;
 }
 
 ConvolutionalNetwork::ConvolutionalNetwork(std::string filename) {//TODO: make assert checks
+
+    log.open(logfile,std::ofstream::out | std::ofstream::app);
+    log << "--------------------------------------------------------" << std::endl;
+    log.close();
+
+
     std::ifstream in(filename);
+    //in >> lossFunction;//TODO:uncomment
     in >> input_width;
     in >> input_heigth;
     in >> num_classes;
@@ -144,25 +196,27 @@ ConvolutionalNetwork::ConvolutionalNetwork(std::string filename) {//TODO: make a
     int numLayers;
     in >> numLayers;
 
-    layers = std::vector<NetworkLayer*>(numLayers);
+
+
+    layers = std::vector<std::unique_ptr<NetworkLayer>>(numLayers);
 
 
     for(int l = 0;l<layers.size();l++){
         std::string layerType;
         in >> layerType;
-        std::cout << std::endl;
+
         if(layerType == "MaxPool"){
             int s;
             int poolSize;
             in >> s;
             in >> poolSize;
-            MaxPoolLayer *layer = new MaxPoolLayer(poolSize,s);//TODO:delete heap allocated variables on destruciton maybe dynamic pointer...
-            //TODO: make destructor of ConvolutionalNetwork.
-            layers[l] = layer;
+
+
+            layers[l] = std::make_unique<MaxPoolLayer>(MaxPoolLayer(poolSize,s));
         }
         else if(layerType == "ReLU"){
-            ReLULayer *layer = new ReLULayer;
-            layers[l] = layer;
+
+            layers[l] = std::make_unique<ReLULayer>(ReLULayer());
         }
         else if(layerType == "FullyConnected"){
 
@@ -198,11 +252,12 @@ ConvolutionalNetwork::ConvolutionalNetwork(std::string filename) {//TODO: make a
             }
 
 
-            FullyConnectedLayer *layer = new FullyConnectedLayer(n,biass,lambda,actFunc);
+            FullyConnectedLayer layer =FullyConnectedLayer(n,biass,lambda,actFunc);
 
-            layer->biases = bmat.clone();
-            layer->weights = currW.clone();
-            layers[l] = layer;
+
+            layer.biases = bmat.clone();
+            layer.weights = currW.clone();
+            layers[l] = std::make_unique<FullyConnectedLayer>(layer);
 
 
         }
@@ -242,11 +297,26 @@ ConvolutionalNetwork::ConvolutionalNetwork(std::string filename) {//TODO: make a
                 //not sure whether it works
                 in >> pr.first >> pr.second;
             }
-            ConvolutionalLayer *layer = new ConvolutionalLayer(fs,nf,lambda);
-            layer->filters = copyVec(filters);
 
-            layers[l] = layer;
 
+            ConvolutionalLayer layer =ConvolutionalLayer(fs,nf,lambda);
+            layer.filters = copyVec(filters);
+
+            layers[l]= std::make_unique<ConvolutionalLayer>(layer);
+
+        }
+        else if(layerType == "Dropout"){
+            int relTime;
+            in >> relTime;
+
+            float dropoutP;
+            in >> dropoutP;
+
+            int a,b,c;
+            in >> a >> b >> c;
+
+            DropoutLayer layer = DropoutLayer(relTime,dropoutP,std::make_tuple(a,b,c));
+            layers[l] = std::make_unique<DropoutLayer>(layer);
         }
         else{
             std::cerr << "Fatal error while loading Network on layer " << l <<" : LayerType <" << layerType << "> doesn't exist" << std::endl;
@@ -255,6 +325,26 @@ ConvolutionalNetwork::ConvolutionalNetwork(std::string filename) {//TODO: make a
             assert(false);
         }
     }
+
+}
+
+ConvolutionalNetwork::~ConvolutionalNetwork() {//TODO:fix memory leak
+
+
+
+}
+
+std::tuple<int,int,int> ConvolutionalNetwork::outputDim() {
+    assert(!layers.empty());
+    std::tuple<int,int,int> out = layers[0]->outputSize(std::make_tuple(input_heigth,input_width,1));
+    for(int l = 1;l<layers.size();l++){
+        out = layers[l]->outputSize(out);
+    }
+    return out;
+}
+
+ConvolutionalNetwork::ConvolutionalNetwork() {
+
 
 }
 

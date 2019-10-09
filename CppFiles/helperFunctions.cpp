@@ -29,8 +29,9 @@ float sigmoidPrime(float in) {
     return sigmoid(in)*(1-sigmoid(in));
 }
 
-std::vector<Mat1f> copyVec(std::vector<Mat1f> in) {
-    //TODO: make pointer
+std::vector<Mat1f> copyVec(std::vector<Mat1f> &in) {
+    //is not pointer because it would cause memory leak
+
     std::vector<Mat1f> retVec = std::vector<Mat1f>(in.size());
     for(int x = 0;x<in.size();x++){
 
@@ -128,5 +129,11 @@ void read_Mnist_Label(std::string filename, std::vector<double> &vec)
         }
     }
 }
+std::string pad_with_0(int number,int totaldigits) {
+    std::ostringstream out;
+    out << std::internal << std::setfill('0') << std::setw(totaldigits) << number;
+    return out.str();
+}
+
 
 

@@ -7,6 +7,8 @@ class ConvolutionalLayer:public NetworkLayer {
 
 public:
 
+
+
     //!number of times the error hasnt been applied
     int passes = 0;
 
@@ -71,6 +73,9 @@ public:
 
     //!Number of Cols of the input processed in this layer. Is initialized only after usage of layer.
     int inputDimensionsCols;
+
+    //!Calculates the output size given the output
+    std::tuple<int,int,int> outputSize(std::tuple<int,int,int> in);
 public:
     //!Initializer for Convolutional Layer
     /*!

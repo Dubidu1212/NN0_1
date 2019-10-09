@@ -3,9 +3,9 @@
 
 #include "helperFunctions.h"
 #include "NetworkLayer.h"
+#include <random>
 
 using namespace cv;
-
 
 
 class ConvolutionalNetwork {
@@ -13,10 +13,17 @@ class ConvolutionalNetwork {
     int input_width,input_heigth,num_classes;
     long long propagations = 0;
     float lambda;
-    std::string lossFunction;
-public:
 
-    std::vector<NetworkLayer*> layers;
+    //! dump for all log things
+    std::ofstream log;
+
+    //!path of the logfile
+    std::string logfile = "log";
+public:
+    std::string lossFunction;
+    std::vector<std::unique_ptr<NetworkLayer>> layers;
+
+
 
     //!propagates the matrix in trough the network
     Mat1f use(Mat1f in);
@@ -39,12 +46,20 @@ public:
 
     void save(std::string filename);
 
+    //!Calculates the output size/dimensions of the network
+    std::tuple<int,int,int> outputDim();
+
+
+
     //!loads a network from a file
-    ConvolutionalNetwork(std::string filename);
+    explicit ConvolutionalNetwork(std::string filename);
+
+    //!Generates a empty network
+    ConvolutionalNetwork();
 
     ConvolutionalNetwork(int input_width,int input_height,int num_classes, float lambda, std::string lossFunction);
 
-
+    ~ConvolutionalNetwork();
 };
 
 

@@ -12,7 +12,7 @@ void addNumToVec(std::vector<Mat1f> in, float num);/*!<Adds a float to each elem
 //static void eWVOp(std::vector<Mat1f> in, float (op)(float));/*!< Elementwise vector operation */
 //TODO: check whether operator type has to be changed. to adapt for Mat3f
 void eWMOp(Mat1f &in, float (op)(float)); /*!< Elementwise matrix operation */
-std::vector<Mat1f> copyVec(std::vector<Mat1f> in);/*!<
+std::vector<Mat1f> copyVec(std::vector<Mat1f> &in);/*!<
  * Copies a Vector of Matrices.
  * @param in Vector to be copied
  * @return Copied Vector
@@ -32,6 +32,7 @@ float sigmoidPrime(float in);/*!< Derivative of sigmoid function */
 
 //!Rectified linear Unit: returns max(x,0)
 float ReLU(float in);
+
 //!Derivative of ReLU
 float dReLU(float in);
 
@@ -43,6 +44,10 @@ void read_Mnist(std::string filename,std::vector<Mat> &vec);
 
 //!Reads the Mnist database labels into a vec<double>. Copied from: http://eric-yuan.me/cpp-read-mnist/
 void read_Mnist_Label(std::string filename,std::vector<double> &vec);
+
+
+//!Pads a int with 0 such that the resulting string has the lenght totladigits
+std::string pad_with_0(int number,int totaldigits);
 
 
 #endif //NN0_1_HELPERFUNCTIONS_H

@@ -28,14 +28,21 @@ std::vector<Mat1f> FullyConnectedLayer::use(std::vector<Mat1f> in) {
         //taking the sigmoid of each element
         eWMOp(outMat,sigmoid);
     }
-    else if(activationFunction == "SoftMaxE" || activationFunction == "SoftMaxS"){//TODO: make numerically stable
+    else if(activationFunction == "SoftMaxE" || activationFunction == "SoftMaxS"){//TODO: check cross entropy
+
+        double min,max;
+        minMaxLoc(outMat,&min,&max);
+        outMat = outMat-max;//make nummericaly stable through the property softmax(x) = softmax(x+c)
+
         exp(outMat,outMat);//raises e to outMat
         float softsum = sum(outMat)[0];//only works with 1 chanel
+
         outMat=outMat/softsum;
         lastSoftmax = outMat.clone();
+        //std::cout << lastSoftmax << std::endl;
     }
     else{
-        std::cerr << "Fatal error while applying activation: activation function <" << activationFunction << ">doesn't exist!" << std::endl;
+        std::cerr << "Fatal error while applying activation: activation function <" << activationFunction << "> doesn't exist!" << std::endl;
     }
 
 
@@ -94,7 +101,10 @@ std::vector<Mat1f> FullyConnectedLayer::dErr(std::vector<Mat1f> in) {
     }
     else if(activationFunction == "SoftMaxE"){//Softmax with included error
 
-        lastpreSig = ((Mat1f)(lastSoftmax-vec)).clone();
+        //lastpreSig = ((Mat1f)(lastSoftmax-vec)).clone();
+
+        lastpreSig = vec.clone();
+
     }
     else{
         std::cerr << "Fatal error while differentiating: activation function <" << activationFunction << ">doesn't exist!" << std::endl;
@@ -138,7 +148,8 @@ void FullyConnectedLayer::applyError() {
     //maybe +=
 
     weights -= (weightsError/passes)*lambda;
-    weightsError = Mat1f(weights.rows,weights.cols,0.0f);
+
+weightsError = Mat1f(weights.rows,weights.cols,0.0f);
 
 
     biases -= (biasesError/passes)*lambda;
@@ -147,4 +158,9 @@ void FullyConnectedLayer::applyError() {
 
 
 
+}
+
+std::tuple<int, int, int> FullyConnectedLayer::outputSize(std::tuple<int,int,int> in) {
+
+    return std::make_tuple(this->nodes,1,1);
 }

@@ -28,6 +28,8 @@ public:
     MaxPoolLayer(int poolingSize, int stride);
     std::vector<Mat1f> use(std::vector<Mat1f> in);
     std::vector<Mat1f> dErr(std::vector<Mat1f> in);
+    std::tuple<int,int,int> outputSize(std::tuple<int,int,int> in);
+
     void applyError();
 };
 

@@ -27,6 +27,17 @@ public:
     //! applies the saved errors. Should be used after the whole batch has accumulated dErr's
     virtual void applyError() = 0;
 
+    //!Computes the size of the output of the layer
+    /*!
+     * Elements in the tuple
+     * -widht
+     * -height
+     * -depth(filters)
+     *
+     * @param in The dimensions of the input
+     * @return The dimensions of the output
+     */
+    virtual std::tuple<int,int,int> outputSize(std::tuple<int,int,int> in) = 0;
 
 };
 

@@ -1334,7 +1334,7 @@ int main(int argc,char* argv[]) {
         int choice;
         std::cin >> choice;
 
-        ConvolutionalNetwork * network;//TODO: stop memory leak by new maybe smart pointer
+        ConvolutionalNetwork * network;
 
         std::string filename;
         switch (choice) {
@@ -1434,6 +1434,12 @@ int main(int argc,char* argv[]) {
         std::string sf;
         std::cin >> sf;
 
+        std::cout << "distfile name:\n";
+        std::string dist;
+        std::cin >> dist;
+        std::ofstream distfile;
+        distfile.open(dist);
+
 
 
         ConvolutionalNetwork convNet(120,120,5,0.07f,"MSE");
@@ -1528,9 +1534,15 @@ int main(int argc,char* argv[]) {
         std::uniform_int_distribution<int> dist300(0,250);
         std::uniform_int_distribution<int> distTest(251,299);
 
+        std::uniform_int_distribution<int> dist2(0,1);
         for(int s = 0;s<samples;s++){
             int random = dist300(mt);
 
+
+            //cheap fix
+            if(random == 0 && dist2(mt)==0){
+                random = dist300(mt);
+            }
 
             Mat1f desiredOutput(5,1,0.0f);
             desiredOutput.at<float>(pvec[random].second) = 1.0f;
@@ -1549,6 +1561,10 @@ int main(int argc,char* argv[]) {
             }
             if(s%200==0){
                 int right = 0,wrong = 0;
+                Mat1f avgdist = Mat1f(5,1,0.0f);
+
+                dynamic_cast<DropoutLayer*>(convNet.layers[6].get())->training = false;
+
                 for(int x = 0;x<50;x++){
 
                     int r = distTest(mt);
@@ -1568,6 +1584,9 @@ int main(int argc,char* argv[]) {
                     double max;
                     cv::Point min_loc, max_loc;
                     cv::minMaxLoc(res, &min, &max, &min_loc, &max_loc);
+
+                    avgdist+= res;
+
                     if(max_loc.y == pvec[r].second){
                         right++;
                     }
@@ -1575,16 +1594,31 @@ int main(int argc,char* argv[]) {
                         wrong++;
                     }
                 }
+
+                dynamic_cast<DropoutLayer*>(convNet.layers[6].get())->training = true;
+
+                avgdist/=50;
+
+
                 std::cout << "right: " << right << " " <<"wrong: " << wrong << std::endl;
                 std::cout << ((float)right/((float)wrong+(float)right))*100 << "%" << std::endl;
+
                 percentagefile <<  s << "," <<((float)right/((float)wrong+(float)right))*100  << "\n";
 
+                distfile << s << ",";
+                for(int x = 0;x<5;x++){
+                    distfile << avgdist.at<float>(x) << ",";
+                }
+                distfile << "\n";
 
             }
             if(s%1000 == 0){
                 convNet.save(sf + std::to_string(s));
                 percentagefile.close();
                 percentagefile.open(pf,std::ofstream::out | std::ofstream::app);
+
+                distfile.close();
+                distfile.open(dist,std::ofstream::out| std::ofstream::app);
             }
 
         }
@@ -1602,8 +1636,15 @@ int main(int argc,char* argv[]) {
         std::cin >> pf;
         std::ofstream percentagefile;
         //to append
-
         percentagefile.open(pf,std::ofstream::out | std::ofstream::app);
+
+        std::cout << "distfile name:\n";
+        std::string dist;
+        std::cin >> dist;
+        std::ofstream distfile;
+        distfile.open(dist,std::ofstream::out| std::ofstream::app);
+
+
 
         std::cout << "Load from:\n";
         std::string sf;
@@ -1611,7 +1652,7 @@ int main(int argc,char* argv[]) {
 
         ConvolutionalNetwork convNet(sf);
 
-        convNet.lossFunction = "MSE";//TODO:check for overfitting
+        convNet.lossFunction = "MSE";
 
         //Read data
 
@@ -1654,8 +1695,15 @@ int main(int argc,char* argv[]) {
         std::uniform_int_distribution<int> dist300(50,299);
         std::uniform_int_distribution<int> distTest(0,49);
 
+        std::uniform_int_distribution<int> dist2(0,1);
+
         for(int s = 0;s<samples;s++){
             int random = dist300(mt);
+
+            //cheap fix
+            if(random == 0 && dist2(mt)==0){
+                random = dist300(mt);
+            }
 
 
             Mat1f desiredOutput(5,1,0.0f);
@@ -1675,6 +1723,10 @@ int main(int argc,char* argv[]) {
             }
             if(s%100==0){
                 int right = 0,wrong = 0;
+                Mat1f avgdist = Mat1f(5,1,0.0f);
+
+                dynamic_cast<DropoutLayer*>(convNet.layers[6].get())->training = false;
+
                 for(int x = 0;x<50;x++){
 
                     int r = distTest(mt);
@@ -1694,6 +1746,9 @@ int main(int argc,char* argv[]) {
                     double max;
                     cv::Point min_loc, max_loc;
                     cv::minMaxLoc(res, &min, &max, &min_loc, &max_loc);
+
+                    avgdist+=res;
+
                     if(max_loc.y == pvec[r].second){
                         right++;
                     }
@@ -1701,16 +1756,30 @@ int main(int argc,char* argv[]) {
                         wrong++;
                     }
                 }
+
+                dynamic_cast<DropoutLayer*>(convNet.layers[6].get())->training = true;
+
+                avgdist/=50;
+
                 std::cout << "right: " << right << " " <<"wrong: " << wrong << std::endl;
                 std::cout << ((float)right/((float)wrong+(float)right))*100 << "%" << std::endl;
                 percentagefile <<  s << "," <<((float)right/((float)wrong+(float)right))*100  << "\n";
 
+                distfile << s << ",";
+                for(int x = 0;x<5;x++){
+                    distfile << avgdist.at<float>(x) << ",";
+                }
+                distfile << "\n";
 
             }
             if(s%1000 == 0){
                 convNet.save(sf + std::to_string(s));
                 percentagefile.close();
                 percentagefile.open(pf,std::ofstream::out | std::ofstream::app);
+
+
+                distfile.close();
+                distfile.open(dist,std::ofstream::out|std::ofstream::app);
             }
 
         }
@@ -1726,7 +1795,9 @@ int main(int argc,char* argv[]) {
 
         ConvolutionalNetwork convNet(sf);
 
-        convNet.lossFunction = "MSE";//TODO:check for overfitting
+        convNet.lossFunction = "MSE";
+
+        dynamic_cast<DropoutLayer*>(convNet.layers[6].get())->training = false;
 
         std::vector<Mat1f> vec(300);
         std::vector<int> labels(300);
@@ -1843,7 +1914,7 @@ int main(int argc,char* argv[]) {
                 int a,b;
                 char coma;
                 LS >> a >> coma >> b;
-                l[la]=b;
+                l[la]=b-1;
 
             }
 
@@ -1910,7 +1981,7 @@ int main(int argc,char* argv[]) {
                 char coma;
                 LS >> a >> coma >> b;
                 std::cout << a << b;
-                l[la]=b;
+                l[la]=b-1;
 
             }
 
@@ -1939,7 +2010,7 @@ int main(int argc,char* argv[]) {
                 cv::Point min_loc, max_loc;
                 cv::minMaxLoc(convNet.use(v[random]), &min, &max, &min_loc, &max_loc);
 
-                std::cout << "Network predicted: " << labelname[max_loc.y - 1] << " correct solution was: " << labelname[l[random] - 1] << std::endl;
+                std::cout << "Network predicted: " << labelname[max_loc.y] << " correct solution was: " << labelname[l[random]] << std::endl;
                 imshow("Image", v[random]);
                 waitKey();
             }
@@ -2237,16 +2308,24 @@ int main(int argc,char* argv[]) {
         ConvolutionalNetwork convNet(nf);
         convNet.lossFunction = "MSE";
 
+        dynamic_cast<DropoutLayer*>(convNet.layers[6].get())->training = false;
 
         std::cout << "File" << std::endl;
         std::string file;
-        std::cin >> file;
-        file = "../Resources/segmentation_WBC-master/Dataset 2/001.bmp";
+        file = "../Resources/LISC Database/Main Dataset/lymp/";
+        std::string temp;
+        std::cin >> temp;
+
+
+        file += temp;
+        std::cout << file << std::endl;
+
+
         Mat1f image = imread(file,IMREAD_GRAYSCALE);
         Mat1f TempImage;
         image/=256;
 
-        unsigned int x,y,w,h;
+        int x,y,w,h;
         x = 0;
         y = 0;
         w = 40;
@@ -2257,9 +2336,21 @@ int main(int argc,char* argv[]) {
 
 
         while(true){
+
+            x = std::max(x,0);
+            y = std::max(y,0);
+            w = std::max(w,0);
+            h = std::max(w,0);
+
+
+
             Rect r(x+1,y+1,w+1,h+1);
+            Rect inner(x+1+((w+1)/5),y+1+((h+1)/5),(w+1)*3/5,(h+1)*3/5);
+
+
             TempImage = image.clone();
             rectangle(TempImage,r,(255,0,0));
+            rectangle(TempImage,inner,(255,0,0));
 
             imshow("Live example",TempImage);
 
@@ -2288,6 +2379,22 @@ int main(int argc,char* argv[]) {
             else if(key == 27){//key esc
                 return 0;
             }
+            else if(key == 'n'){//new image
+                std::cout << "File" << std::endl;
+                std::string file;
+                file = "../Resources/LISC Database/Main Dataset/lymp/";
+                std::string temp;
+                std::cin >> temp;
+
+
+                file += temp;
+                std::cout << file << std::endl;
+
+
+                Mat1f image = imread(file,IMREAD_GRAYSCALE);
+                Mat1f TempImage;
+                image/=256;
+            }
             else if(key == 'r'){//result
                 Mat1f input(image,r);
                 resize(input,input,Size(120,120));
@@ -2301,7 +2408,7 @@ int main(int argc,char* argv[]) {
                 std::cout << maxPos.y << std::endl;
             }
             else{
-                std::cout << key << std::endl;
+                std::cout << "Classified as Lymphocyte" << std::endl;
             }
 
 

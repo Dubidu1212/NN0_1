@@ -53,7 +53,6 @@ float ReLU(float in) {
     return std::max(in,0.0f);
 }
 
-//TODO: this is worng because relu is not dependant on output but on input!
 float dReLU(float in) {
     if(in < 0){
         return 0;
